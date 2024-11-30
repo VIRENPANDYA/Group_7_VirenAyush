@@ -17,10 +17,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Homescreen(),
+      debugShowCheckedModeBanner: false,
+      home:  const Homescreen(),
       routes: {
-        '/home' : (context) => Homescreen(),
-        '/cart' : (context) => CartScreen(cartItems: [],),
+        '/home' : (context) => const Homescreen(),
       },
     );
   }
