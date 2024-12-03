@@ -58,56 +58,88 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final double totalAmount = cartItems.fold(0.0, (sum, item) => sum + item.price * item.quantity);
     return Scaffold(
-      backgroundColor: Colors.blueGrey[50],
       appBar: AppBar(
-        title: const Text('Grab&GoGoods', style: TextStyle(color: Colors.red, fontSize: 28)),
-        backgroundColor: Colors.blueGrey,
+        title: const Text(
+          'Grab&GoGoods',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange, Colors.red],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Container(
-        color: Colors.blueGrey,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueGrey, Colors.black87],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: Column(
           children: [
             Expanded(
               child: ListView.builder(
                 itemCount: cartItems.length,
-                itemBuilder: (ctx, i) => Container(
-                  color: Colors.blueGrey,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.blueGrey,
-                      child: Text('${cartItems[i].quantity}x', style: const TextStyle(color: Colors.deepOrange)),
+                itemBuilder: (ctx, i) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    title: Text(cartItems[i].title, style: const TextStyle(color: Colors.deepOrange)),
-                    subtitle: Text('\$${cartItems[i].price * cartItems[i].quantity}', style: const TextStyle(color: Colors.deepOrange)),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.deepOrange),
-                      onPressed: () {
-                        // Handle item removal
-                        removeFromCart(cartItems[i]);
-                        (context as Element).markNeedsBuild();
-                      },
+                    elevation: 5,
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.orange,
+                        child: Text(
+                          '${cartItems[i].quantity}x',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      title: Text(
+                        cartItems[i].title,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        '\$${(cartItems[i].price * cartItems[i].quantity).toStringAsFixed(2)}',
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          removeFromCart(cartItems[i]);
+                          (context as Element).markNeedsBuild();
+                        },
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Total: \$${totalAmount.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 20, color: Colors.deepOrange),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       backgroundColor: Colors.red,
-                      textStyle: const TextStyle(fontSize: 20),
-                      foregroundColor: Colors.black,
                     ),
                     onPressed: () => placeOrder(context),
-                    child: const Text('Order Now', style: TextStyle(color: Colors.black)),
+                    child: const Text(
+                      'Order Now',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
                   ),
                 ],
               ),
