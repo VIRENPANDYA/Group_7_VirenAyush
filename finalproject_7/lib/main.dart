@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:finalproject_7/screens/cartscreen.dart';
 import 'package:finalproject_7/screens/homescreen.dart';
 
 void main() {

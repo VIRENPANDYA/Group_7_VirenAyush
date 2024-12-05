@@ -1,6 +1,7 @@
 // file: lib/screens/cartscreen.dart
 // Author : Viren Pandya
 // Description: This will be cart page where user would be able to add items and order!
+import 'package:finalproject_7/screens/PaymentScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:finalproject_7/models/products.dart';
 
@@ -29,24 +30,12 @@ class CartScreen extends StatelessWidget {
         ),
       );
     } else {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Order Completed', style: TextStyle(color: Colors.deepOrange)),
-          content: const Text('Thank you, your order is completed!', style: TextStyle(color: Colors.deepOrange)),
-          backgroundColor: Colors.blueGrey,
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                Navigator.of(context).pop(); // Go back to home screen
-                resetQuantities();
-              },
-              child: const Text('Back to Home', style: TextStyle(color: Colors.deepOrange)),
-            ),
-          ],
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => PaymentScreen(
+          cartItems: cartItems,
+          resetQuantities: resetQuantities,
         ),
-      );
+      ));
     }
   }
 
