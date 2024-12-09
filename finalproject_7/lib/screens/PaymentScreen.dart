@@ -1,9 +1,14 @@
-// file: lib/screens/cartscreen.dart
-// Author : Ayush Patel
-// Description: This will be cart page where user would be pay for the order and get oder confirmation number.
+// file: lib/screens/PaymentScreen.dart
+// Author : Ayush Patel and viren
+// Description: displays an order summary, validates card details, and processes the payment. Upon successful payment, it generates a confirmation number, resets cart quantities, saves the order using SharedPreferences, and navigates back to the Homescreen
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:finalproject_7/models/products.dart';
+import 'package:finalproject_7/utils/shared_preferences_helper.dart';
+//new added features by me on 6th december by Viren
+import 'package:finalproject_7/screens/cartscreen.dart';
+import 'package:finalproject_7/screens/homescreen.dart';
+import 'package:finalproject_7/screens/ordersscreen.dart';
 
 class PaymentScreen extends StatelessWidget {
   final List<Product> cartItems;
@@ -11,6 +16,23 @@ class PaymentScreen extends StatelessWidget {
   final VoidCallback resetQuantities;
 
   PaymentScreen({super.key, required this.cartItems, required this.resetQuantities});
+  Future<void>processPayment(List<Product> cartItems, double totalPrice) async {
+      List<Map<String, dynamic>> cartItemsMap = cartItems.map((product) => product.toMap()).toList();
+  // Create an order
+  final newOrder = {
+    'items': cartItemsMap,
+    'total': totalPrice,
+    'date': DateTime.now().toString().split(' ')[0],
+  };
+  // Retrieve existing orders from SharedPreferences
+  List<Map<String, dynamic>> orders = await SharedPreferencesHelper.getOrders();
+  
+  // Save to orders
+  orders.add(newOrder);
+
+  // Save orders to SharedPreferences after each order is placed.
+  await SharedPreferencesHelper.saveOrders(orders); // Added by Viren
+}
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +56,12 @@ class PaymentScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(ctx).pop();
-                Navigator.of(context).pop(); 
-                Navigator.of(context).pop(); 
+                //reset code implemented by viren
                 resetQuantities();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => Homescreen()),
+                  (route) => false,
+                ); 
               },
               child: const Text('OK'),
             ),
@@ -45,7 +70,7 @@ class PaymentScreen extends StatelessWidget {
       );
     }
 
-    void validateAndPay() {
+    void validateAndPay() async {
       if (cardNumberController.text.isEmpty ||
           expiryDateController.text.isEmpty ||
           cvvController.text.isEmpty ||
@@ -68,12 +93,20 @@ class PaymentScreen extends StatelessWidget {
           ),
         );
       } else {
+        await processPayment(cartItems, finalAmount);
         confirmPayment();
       }
     }
 
     return Scaffold(
       appBar: AppBar(
+        //added by viren 
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back), //back button
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: const Text('Payment Page'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -85,6 +118,7 @@ class PaymentScreen extends StatelessWidget {
           ),
         ),
       ),
+      
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -189,6 +223,36 @@ class PaymentScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 2, // Set to Payment screen
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => Homescreen()));
+          } else if (index == 1) {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => Ordersscreen()));
+          } else if (index == 2) {
+            Navigator.push(
+              context, MaterialPageRoute(builder: (_) => CartScreen(cartItems: cartItems, resetQuantities: resetQuantities))
+            );
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Orders',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.payment),
+            label: 'Payment',
+          ),
+        ],
       ),
     );
   }
